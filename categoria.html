@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Categorías</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            color: #343a40;
+        }
+        .navbar {
+            background-color: #343a40;
+        }
+        .navbar-brand {
+            color: #ffffff;
+        }
+        .offcanvas {
+            background-color: #212529;
+        }
+        .offcanvas-title {
+            color: #ffffff;
+        }
+        .nav-link {
+            color: #ffffff;
+        }
+        .nav-link.active {
+            color: #d63384;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #004085;
+        }
+        .table thead {
+            background-color: #007bff;
+            color: #ffffff;
+        }
+        .table tbody tr:nth-child(even) {
+            background-color: #e9ecef;
+        }
+        .modal-content {
+            border-radius: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Gestión de Categorías</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasDarkNavbar" aria-labelledby="offcanvasDarkNavbarLabel">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title" id="offcanvasDarkNavbarLabel">Menú de Opciones</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body">
+                    <ul class="navbar-nav">
+                        <li class="nav-item"><a class="nav-link" href="index.html">Inicio</a></li>
+                        <li class="nav-item"><a class="nav-link" href="cliente.html">Clientes</a></li>
+                        <li class="nav-item"><a class="nav-link" href="producto.html">Productos</a></li>
+                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="categoria.html">Categoría</a></li>
+                        <li class="nav-item"><a class="nav-link" href="pedido.html">Pedidos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="proveedor.html">Proveedores</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5 pt-5">
+        <div class="row">
+            <div class="col-md-12">
+                <h1 class="text-center mb-4">Listado de Categorías</h1>
+                <div class="d-flex justify-content-end mb-3">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">Agregar Categoría</button>
+                </div>
+
+                <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="staticBackdropLabel">Agregar Categoría</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="formularioCategoria" method="post">
+                                    <div class="mb-3">
+                                        <label for="nombre" class="form-label">Nombre</label>
+                                        <input type="text" class="form-control" id="nombre" name="nombre" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="descripcion" class="form-label">Descripción</label>
+                                        <textarea class="form-control" id="descripcion" name="descripcion" rows="3" required></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="stock" class="form-label">Stock</label>
+                                        <input type="number" class="form-control" id="stock" name="stock" required>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="reset" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="submit" form="formularioCategoria" class="btn btn-primary">Agregar Categoría</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Stock</th>
+                            <th>Creado</th>
+                            <th>Actualizado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpoTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function traerDatos() {
+            $.ajax({
+                type: "GET",
+                url: "http://98.80.71.120:3001/api/categorias",
+                success: function(data) {
+                    var cuerpoTable = $("#cuerpoTable");
+                    cuerpoTable.empty();
+                    data.forEach(function(categoria) {
+                        var fila = `<tr>
+                                        <td>${categoria.id}</td>
+                                        <td>${categoria.nombre}</td>
+                                        <td>${categoria.descripcion}</td>
+                                        <td>${categoria.stock}</td>
+                                        <td>${new Date(categoria.created_at).toLocaleDateString()}</td>
+                                        <td>${new Date(categoria.updated_at).toLocaleDateString()}</td>
+                                    </tr>`;
+                        cuerpoTable.append(fila);
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error al traer los datos", status, error);
+                }
+            });
+        }
+
+        $("#formularioCategoria").submit(function(event) {
+            event.preventDefault();
+
+            var nombre = $("#nombre").val();
+            var descripcion = $("#descripcion").val();
+            var stock = $("#stock").val();
+
+            $.ajax({
+                type: "POST",
+                url: "http://98.80.71.120:3001/api/categorias",
+                data: JSON.stringify({
+                    nombre: nombre,
+                    descripcion: descripcion,
+                    stock: stock
+                }),
+                contentType: "application/json; charset=utf-8",
+                success: function(response) {
+                    $("#staticBackdrop").modal('hide');
+                    alert("Categoría agregada con éxito");
+                    traerDatos();
+                    $("#formularioCategoria")[0].reset();
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error al agregar", status, error);
+                }
+            });
+        });
+
+        $(document).ready(function() {
+            traerDatos();
+        });
+    </script>
+</body>
+</html>
