@@ -144,7 +144,7 @@
         function traerDatos() {
             $.ajax({
                 type: "GET",
-                url: "http://98.80.71.120:3001/api/pedidos",
+                url: "http://3.84.201.209:3001/api/pedidos",
                 success: function(data) {
                     var cuerpoTable = $("#cuerpoTable");
                     cuerpoTable.empty();
@@ -177,7 +177,7 @@
 
             $.ajax({
                 type: "POST",
-                url: "http://98.80.71.120:3001/api/pedidos",
+                url: "http://3.84.201.209:3001/api/pedidos",
                 data: JSON.stringify({
                     nombre: nombre,
                     fecha: fecha,
